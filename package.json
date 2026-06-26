@@ -1,0 +1,24 @@
+{
+  "name": "pi-research-team",
+  "version": "1.0.0",
+  "description": "Multi-agent research pipeline and visual TUI dashboards for Pi Coding Agent",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "dependencies": {
+    "yaml": "^2.3.4",
+    "undici": "^6.0.0",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "@mariozechner/pi-ai": "*",
+    "typebox": "*"
+  },
+  "pi": {
+    "extensions": ["extensions/*.ts"],
+    "skills": ["skills/*"],
+    "prompts": ["prompts/*.md"],
+    "themes": ["themes/*.json"]
+  }
+}

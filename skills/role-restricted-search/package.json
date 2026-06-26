@@ -1,0 +1,8 @@
+{
+  "name": "role-restricted-search",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "undici": "^6.0.0"
+  }
+}
