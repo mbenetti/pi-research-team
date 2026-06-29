@@ -1,6 +1,6 @@
 # 🔬 Pi Research Team
 
-A visual, multi-agent academic research pipeline with information compartmentalization and smart fallback searching for the [Pi Coding Agent](https://pi.dev).
+A visual, multi-agent academic research pipeline with information compartmentalization.
 
 ## Features
 
