@@ -8,6 +8,7 @@ A visual, multi-agent academic research pipeline with information compartmentali
 - 🧱 **Information Isolation**: Protects your LLM context window! Sub-agents analyze high-density records and forward metadata or summaries, and only the specialist `scientist` reads high-resolution full-text contents.
 - 🔍 **Hybrid Search Fork**: Tavily API web search with automated local Ollama search fallback.
 - 📄 **LiteParse Extraction**: Downloads PDFs and parses spatial layouts and tables into prompt-clean Markdown.
+- ⚡ **Parallel Multi-Agent Execution**: Run multiple specialist agents simultaneously while tracking progress, tool activity, and responses dynamically.
 
 ## Installation
 
@@ -37,5 +38,27 @@ Shows a compact, multi-line tree overview of sub-agents with activity badges, to
 ```bash
 pi -e extensions/research-tree.ts
 ```
+
+## Available Agents & Parallel Execution
+
+The repository configures a set of specialized sub-agents with unique system prompts and tool access:
+
+- **Planner**: Generates structured, step-by-step implementation plans for complex topics.
+- **Research Manager**: Oversees the research scope and synthesizes findings into the final report.
+- **Researcher**: Explores and downloads source materials; has strict memory limits (reads abstracts and first 50 lines).
+- **Scientist**: Performs deep paper analysis with full-document access (methodology, results, tables).
+- **Section Writer**: Produces publication-ready academic content with consistent [Author, Year] formatting.
+- **Section Critic**: Evaluates written draft sections for precision, accuracy, and formatting checkpoints.
+
+In the **Tree/List Dashboard**, any agent can invoke the `query_tree_researchers` tool to launch parallel, concurrent subprocesses querying multiple specialists at the same time:
+```ts
+query_tree_researchers({
+  queries: [
+    { agent: "researcher", question: "Research the exact speed of light..." },
+    { agent: "scientist", question: "Provide a rigorous definition of gravity..." }
+  ]
+})
+```
+This safely manages isolation boundaries, intercepts execution logs, and routes the summarized results cleanly back to the manager's context.
 
 *These dashboards will prompt you to select a starting roster (e.g. `research-team`) and activate visual panels in your view.*

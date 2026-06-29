@@ -353,7 +353,8 @@ export default function (pi: ExtensionAPI) {
 		const args = [
 			"--mode", "json",
 			"-p",
-			"--no-session"
+			"--no-session",
+			"--no-extensions"
 		];
 		
 		const langfuseExt = join(ctx.cwd || process.cwd(), "extensions", "langfuse-trace.ts");

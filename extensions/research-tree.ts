@@ -693,7 +693,8 @@ export default function (pi: ExtensionAPI) {
     const args: string[] = [
       "--mode", "json",
       "-p",
-      "--no-session"
+      "--no-session",
+      "--no-extensions"
     ];
 
     if (existsSync(langfuseExt)) {

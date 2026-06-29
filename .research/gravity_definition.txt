@@ -1,0 +1,29 @@
+=== Scientist Report: Definition of Gravity ===
+
+Gravity is one of the four fundamental interactions of nature, along with electromagnetism, the weak interaction, and the strong interaction. It is the phenomenon by which all things with mass or energy are brought toward one another.
+
+1. Classical Physics Perspective (Newtonian Gravity)
+   - Formulated by Sir Isaac Newton in his 1867 work, *Philosophiae Naturalis Principia Mathematica*.
+   - Definition: Gravity is modeled as an instantaneous attractive force acting at a distance between any two point masses.
+   - Mathematical Formulation: The magnitude of the gravitational force (F) between two masses (m1 and m2) separated by a distance (r) is given by:
+     F = G * (m1 * m2) / r^2
+     where G is the gravitational constant (approx. 6.674 × 10^-11 m^3 kg^-1 s^-2).
+   - Core Concepts:
+     - Passive and Active Mass: Every mass acts as both a source of gravitational field (active) and responds to external fields (passive).
+     - Action-at-a-Distance: Changes in mass distribution are felt instantaneously throughout the universe, which implies an infinite speed of gravity (this contradiction was resolved by relativity).
+
+2. Modern Physics Perspective (Einsteinian General Relativity)
+   - Formulated by Albert Einstein in 1915.
+   - Definition: Gravity is not an attractive force, but rather a geometric consequence of the curvature of four-dimensional spacetime caused by the uneven distribution of mass and energy.
+   - Mathematical Formulation: Described by the Einstein Field Equations:
+     G_μν + Λ g_μν = (8πG / c^4) T_μν
+     where:
+     - G_μν is the Einstein tensor (describing spacetime curvature).
+     - g_μν is the metric tensor.
+     - Λ is the cosmological constant.
+     - T_μν is the stress-energy-momentum tensor (representing the distribution of mass, energy, and momentum).
+     - c is the speed of light.
+   - Core Concepts:
+     - Spacetime Curvature: Mass-energy tells spacetime how to curve; curved spacetime tells mass-energy how to move along paths called geodesics (the straightest possible paths in a curved manifold).
+     - Equivalence Principle: The local effects of gravity are indistinguishable from the effects of a uniformly accelerating reference frame.
+     - Finite Propagation Speed: Gravitational disturbances propagate as waves (gravitational waves) through spacetime at exactly the speed of light (c), resolving Newton's instantaneous action-at-a-distance paradox.

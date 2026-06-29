@@ -1,0 +1,18 @@
+=== Researcher Report: Speed of Light ===
+
+1. Exact Speed of Light:
+   - In a vacuum, the speed of light is defined as exactly 299,792,458 meters per second (m/s), which is approximately 3.00 × 10^8 m/s or 186,282 miles per second.
+   - Since 1983, the meter has been defined in the International System of Units (SI) as the distance light travels in a vacuum in 1/299,792,458 of a second. This makes the speed of light an exact defined constant, rather than a measured quantity.
+
+2. Significance in Physics:
+   - Universal Speed Limit: In the theory of special relativity, c is the maximum speed at which all conventional matter and information in the universe can travel.
+   - Constant in Relativity: It acts as a fundamental constant of nature, linking space and time in the spacetime continuum (dx^2 + dy^2 + dz^2 - c^2 dt^2 = 0) and defining the equivalence of mass and energy via Einstein's equation, E = mc^2.
+   - Medium Variation: While constant in a vacuum, light slows down when passing through transparent media (such as water, glass, or air), characterized by the medium's refractive index (n = c/v).
+
+3. Historical Overview of Measurements:
+   - Ole Rømer (1676): First quantitative estimation. By studying the eclipses of Jupiter's moon Io, Rømer realized that the eclipses appeared delayed when Earth was farther from Jupiter, concluding that light takes time to travel. He estimated that light takes about 22 minutes to cross the diameter of Earth's orbit.
+   - James Bradley (1728): Used stellar aberration (the apparent shift in position of stars due to the Earth's motion) to calculate light speed as approximately 301,000 km/s.
+   - Armand Fizeau (1849): Performed the first terrestrial measurement using a rapidly rotating cogwheel and a distant mirror (8 km away). He obtained a value of about 313,000 km/s.
+   - Léon Foucault (1862): Improved on Fizeau's method by replacing the cogwheel with a rotating mirror, yielding a more accurate value of 298,000 km/s.
+   - Albert A. Michelson ( late 19th & early 20th centuries): Refined the rotating mirror method extensively using vacuum tubes and long baseline measurements, achieving extreme precision (e.g., 299,774 km/s in 1926).
+   - Laser Interferometry (1970s): Used stabilized helium-neon lasers and cesium clocks to determine the speed with fractional uncertainties of 10^-9, leading to the 1983 definition of the meter which fixed the speed of light exactly.
