@@ -11,7 +11,7 @@ A visual, multi-agent academic research pipeline with information compartmentali
 
 ## Installation
 
-Run this inside your Pi terminal:
+Both dashboards are installed together as a single package. Run this inside your Pi terminal to install them:
 ```bash
 pi install git:github.com/mbenetti/pi-research-team.git
 ```
