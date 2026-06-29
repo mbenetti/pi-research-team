@@ -471,10 +471,10 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  // ── query_researchers Tool ───────────────────────────────────────────
+  // ── query_tree_researchers Tool ───────────────────────────────────────────
 
   pi.registerTool({
-    name: "query_researchers",
+    name: "query_tree_researchers",
     label: "Query Researchers",
     description: "Query one or more research agents IN PARALLEL. All agents run simultaneously as concurrent subprocesses.\nPass an array of queries — each with an agent name and a specific question. All agents start at the same time and their results are returned together.",
 
@@ -575,7 +575,7 @@ export default function (pi: ExtensionAPI) {
       const queries = (args as any).queries || [];
       const names = queries.map((q: any) => displayName(q.agent || "?")).join(", ");
       return new Text(
-        theme.fg("toolTitle", theme.bold("query_researchers ")) +
+        theme.fg("toolTitle", theme.bold("query_tree_researchers ")) +
         theme.fg("accent", `${queries.length} parallel`) +
         theme.fg("dim", " — ") +
         theme.fg("muted", names),
@@ -832,7 +832,7 @@ export default function (pi: ExtensionAPI) {
     const expertNames = Array.from(state.agents.values()).map(s => displayName(s.def.name)).join(", ");
 
     const systemPrompt = `You are leading the ${state.currentTeam}. You have access to ${state.agents.size} team members.
-Use the \`query_researchers\` tool to assign tasks to these members in parallel.
+Use the \`query_tree_researchers\` tool to assign tasks to these members in parallel.
 Available members: ${expertNames}
 
 ${expertCatalog}`;
@@ -855,7 +855,7 @@ ${expertCatalog}`;
       `Research Tree loaded — ${state.agents.size} members in ${state.currentTeam}: ${expertNames}\n\n` +
       `/research-tree [name]  Switch teams (e.g. /research-tree literature-team)\n` +
       `/tree-status           Show current agent status\n\n` +
-      `Use the query_researchers tool to use them!`,
+      `Use the query_tree_researchers tool to use them!`,
       "info",
     );
 
