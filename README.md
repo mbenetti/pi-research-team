@@ -39,6 +39,51 @@ Shows a compact, multi-line tree overview of sub-agents with activity badges, to
 pi -e extensions/research-tree.ts
 ```
 
+---
+
+## 💡 Designing a Research Query: Minimum Viable Research Query (MVRQ)
+
+To get high-quality results from the multi-agent team and avoid unfocused browser searches or irrelevant paper processing, use a **Minimum Viable Research Query (MVRQ)** structure. A complete query should contain:
+1. **Topic**: The core subject or comparison.
+2. **Scope**: Specific sub-topics to include and explicit exclusions.
+3. **Depth/Timeframe**: Preferred publication years and study types (e.g. clinical trials, SOTA).
+4. **Output Requirement**: Expected figures, tables, or comparative indices.
+
+### MVRQ Example:
+> **Topic**: Direct Preference Optimization (DPO) vs. RLHF in LLM alignment.  
+> **Scope**: Focus on computational efficiency and training stability comparisons. Exclude non-text LLM alignment (multimodal DPO).  
+> **Depth**: Include at least 3 foundational papers (e.g., Rafailov et al.) and at least 2 recent empirical reviews (2024).  
+> **Output**: A comparative evaluation table summarizing computation times and resource requirements.
+
+---
+
+## 🔄 Pre-Planning Clarification Workflow
+
+When a query is ambiguous, the team is equipped to perform a **Pre-Planning Clarification Step** before handing the task to the `planner`. This prevents wasteful token usage and keeps your research highly targeted.
+
+```
+ User ──> [Research Manager / Analyst] ──> Needs Clarification? (Ask questions)
+                                                         │
+ User <── Feedback / Criteria Answers ───────────────────┘
+   │
+   └──> [Research Manager] ──> Formulate Goal ──> [planner] ──> Start Execution
+```
+
+1. **Clarification Stage (`prompts/clarify-research.md`)**:
+   If a general query like *"Research AI in healthcare"* is received, the Manager uses the clarification prompt to generate 2-3 targeted questions detailing:
+   * **Scope**: What specific sub-topics/applications (e.g., diagnostic imaging vs. drug discovery)?
+   * **Depth**: Are we looking for foundational papers or state-of-the-art advances?
+   * **Timeframe**: Focus on general history or recent papers (last 2 years)?
+   * **Use case**: Literature review, thesis reference, or general learning?
+
+2. **Goal Formation (`prompts/create-goal.md`)**:
+   Once the answers are returned, the manager creates a highly structured **Research Goal** detailing objective boundaries, success criteria, and targets.
+
+3. **Planning Stage**:
+   The finalized Research Goal is given to the `planner` to design an execution roadmap for the `researcher`, `scientist`, `section-writer`, and `section-critic` agents.
+
+---
+
 ## Available Agents & Parallel Execution
 
 The repository configures a set of specialized sub-agents with unique system prompts and tool access:
