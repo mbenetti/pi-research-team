@@ -681,9 +681,13 @@ export default function (pi: ExtensionAPI) {
     }
 
     const startTime = Date.now();
-    const model = ctx.model
+    let model = ctx.model
       ? `${ctx.model.provider}/${ctx.model.id}`
       : "openrouter/google/gemini-3-flash-preview";
+
+    if (model && model.includes("gemini-3.5-flash")) {
+      model = "openrouter/google/gemini-2.5-flash";
+    }
 
     const langfuseExt = join(ctx.cwd || process.cwd(), "extensions", "langfuse-trace.ts");
     const args: string[] = [
@@ -699,7 +703,7 @@ export default function (pi: ExtensionAPI) {
     args.push(
       "--model", model,
       "--tools", state.agents.get(stateKey)!.def.tools.join(","),
-      "--append-system-prompt", state.agents.get(stateKey)!.def.systemPrompt,
+      "--system-prompt", state.agents.get(stateKey)!.def.systemPrompt,
       question
     );
 

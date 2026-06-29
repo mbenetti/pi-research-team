@@ -452,9 +452,13 @@ export default function (pi: ExtensionAPI) {
 			updateWidget();
 		}, 1000);
 
-		const model = ctx.model
+		let model = ctx.model
 			? `${ctx.model.provider}/${ctx.model.id}`
 			: "openrouter/google/gemini-3-flash-preview";
+
+		if (model && model.includes("gemini-3.5-flash")) {
+			model = "openrouter/google/gemini-2.5-flash";
+		}
 
 		// Session file for this agent
 		const agentKey = state.def.name.toLowerCase().replace(/\s+/g, "-");
