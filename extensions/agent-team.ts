@@ -223,6 +223,14 @@ function scanAgentDirs(cwd: string): AgentDef[] {
 // ── Extension ────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
+	// Prevent clashing dashboards by bypassing initialization if another view is explicitly requested
+	const hasOtherDashboard = process.argv.some(arg =>
+		arg.includes("research-tree") || arg.includes("research-tui")
+	);
+	if (hasOtherDashboard) {
+		return;
+	}
+
 	const agentStates: Map<string, AgentState> = new Map();
 	let allAgentDefs: AgentDef[] = [];
 	let teams: Record<string, string[]> = {};
