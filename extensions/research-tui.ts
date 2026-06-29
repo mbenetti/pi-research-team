@@ -304,9 +304,9 @@ export default function (pi: ExtensionAPI) {
 		for (const s of experts.values()) {
 			if (s.def.name.toLowerCase() === targetName) {
 				totalCount++;
-				if (s.status === "idle" && !state) {
+				if (s.status !== "researching" && !state) {
 					state = s;
-				} else if (s.status !== "idle") {
+				} else if (s.status === "researching") {
 					busyCount++;
 				}
 			}
@@ -360,7 +360,6 @@ export default function (pi: ExtensionAPI) {
 		args.push(
 			"--model", model,
 			"--tools", state.def.tools,
-			"--thinking", "off",
 			"--append-system-prompt", state.def.systemPrompt,
 			question
 		);
@@ -384,9 +383,9 @@ export default function (pi: ExtensionAPI) {
 					if (!line.trim()) continue;
 					try {
 						const event = JSON.parse(line);
-						if (event.type === "message_update") {
-							const delta = event.assistantMessageEvent;
-							if (delta?.type === "text_delta") {
+						const delta = event.assistantMessageEvent;
+						if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+							if (delta) {
 								textChunks.push(delta.delta || "");
 								const full = textChunks.join("");
 								const last = full.split("\n").filter((l: string) => l.trim()).pop() || "";
@@ -405,9 +404,9 @@ export default function (pi: ExtensionAPI) {
 				if (buffer.trim()) {
 					try {
 						const event = JSON.parse(buffer);
-						if (event.type === "message_update") {
-							const delta = event.assistantMessageEvent;
-							if (delta?.type === "text_delta") textChunks.push(delta.delta || "");
+						const delta = event.assistantMessageEvent;
+						if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+							if (delta) textChunks.push(delta.delta || "");
 						}
 					} catch {}
 				}
@@ -470,6 +469,11 @@ Pass an array of queries — each with an agent name and a specific question.`,
 
 		async execute(_toolCallId, params, _signal, onUpdate, ctx) {
 			const { queries } = params as { queries: { agent: string; question: string }[] };
+
+			// Reset all agents to idle before starting a new batch of parallel queries
+			for (const expert of experts.values()) {
+				expert.status = "idle";
+			}
 
 			if (!queries || queries.length === 0) {
 				return {

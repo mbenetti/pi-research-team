@@ -46,11 +46,6 @@ if [ -z "$QUERY" ]; then
 fi
 
 # Role definitions
-ROLE_LEVELS["manager"]=1
-ROLE_LEVELS["researcher"]=2
-ROLE_LEVELS["scientist"]=3
-ROLE_LEVELS["unknown"]=0
-
 declare -A ROLE_LEVELS
 ROLE_LEVELS["manager"]=1
 ROLE_LEVELS["researcher"]=2
@@ -78,14 +73,14 @@ RAW_OUTPUT=$("$API_CALL" "$QUERY" $API_ARGS 2>/dev/null || echo "[]")
 case "$ROLE_LEVEL" in
   0|1)
     # Manager: summaries only, 10 results max
-    echo "$RAW_OUTPUT" | "$SCRIPT_DIR/filter-summaries.js" --max 10
+    echo "$RAW_OUTPUT" | node "$SCRIPT_DIR/filter-summaries.js" --max 10
     ;;
   2)
     # Researcher: abstracts + key points, 20 results max
-    echo "$RAW_OUTPUT" | "$SCRIPT_DIR/filter-abstracts.js" --max 20
+    echo "$RAW_OUTPUT" | node "$SCRIPT_DIR/filter-abstracts.js" --max 20
     ;;
   3)
     # Scientist: full snippets + URLs, 30 results max
-    echo "$RAW_OUTPUT" | "$SCRIPT_DIR/filter-full.js" --max 30
+    echo "$RAW_OUTPUT" | node "$SCRIPT_DIR/filter-full.js" --max 30
     ;;
 esac

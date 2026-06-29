@@ -20,7 +20,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Container, Text, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { Type } from "@sinclair/typebox";
 import { spawn } from "child_process";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, appendFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { applyExtensionDefaults } from "./themeMap.ts";
 
@@ -491,6 +491,11 @@ export default function (pi: ExtensionAPI) {
     async execute(_toolCallId, params, _signal, onUpdate, ctx) {
       const { queries } = params as { queries: { agent: string; question: string }[] };
 
+      // Reset all agents to idle before starting a new batch of parallel queries
+      for (const [_, agent] of state.agents) {
+        agent.status = "idle";
+      }
+
       if (!queries || queries.length === 0) {
         return {
           content: [{ type: "text", text: "No queries provided." }],
@@ -641,7 +646,7 @@ export default function (pi: ExtensionAPI) {
     for (const [key, s] of state.agents) {
       if (s.def.name.toLowerCase() === targetName) {
         totalCount++;
-        if (s.status === "idle" && !stateKey) {
+        if (s.status !== "researching" && !stateKey) {
           stateKey = key;
         }
       }
@@ -656,8 +661,9 @@ export default function (pi: ExtensionAPI) {
           elapsed: 0,
         });
       } else {
+        const statuses = Array.from(state.agents.entries()).map(([k, s]) => `${k}=${s.status}`).join(", ");
         return Promise.resolve({
-          output: `All ${totalCount} instances of "${displayName(expertName)}" are currently busy. Wait for them to finish.`,
+          output: `All ${totalCount} instances of "${displayName(expertName)}" are currently busy. Wait for them to finish. Current states: ${statuses}`,
           exitCode: 1,
           elapsed: 0,
         });
@@ -693,7 +699,6 @@ export default function (pi: ExtensionAPI) {
     args.push(
       "--model", model,
       "--tools", state.agents.get(stateKey)!.def.tools.join(","),
-      "--thinking", "off",
       "--append-system-prompt", state.agents.get(stateKey)!.def.systemPrompt,
       question
     );
@@ -716,9 +721,9 @@ export default function (pi: ExtensionAPI) {
           if (!line.trim()) continue;
           try {
             const event = JSON.parse(line);
-            if (event.type === "message_update") {
-              const delta = event.assistantMessageEvent;
-              if (delta?.type === "text_delta") {
+            const delta = event.assistantMessageEvent;
+            if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+              if (delta) {
                 textChunks.push(delta.delta || "");
                 const full = textChunks.join("");
                 const last = full.split("\n").filter((l: string) => l.trim()).pop() || "";
@@ -751,9 +756,9 @@ export default function (pi: ExtensionAPI) {
         if (buffer.trim()) {
           try {
             const event = JSON.parse(buffer);
-            if (event.type === "message_update") {
-              const delta = event.assistantMessageEvent;
-              if (delta?.type === "text_delta") textChunks.push(delta.delta || "");
+            const delta = event.assistantMessageEvent;
+            if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+              if (delta) textChunks.push(delta.delta || "");
             }
           } catch {}
         }

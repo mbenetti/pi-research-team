@@ -476,7 +476,6 @@ export default function (pi: ExtensionAPI) {
 			...(subagentExtPath ? ["-e", subagentExtPath] : []),
 			"--model", model,
 			"--tools", state.def.tools,
-			"--thinking", "off",
 			"--append-system-prompt", state.def.systemPrompt,
 			"--session", agentSessionFile,
 		];
@@ -508,9 +507,9 @@ export default function (pi: ExtensionAPI) {
 					if (!line.trim()) continue;
 					try {
 						const event = JSON.parse(line);
-						if (event.type === "message_update") {
-							const delta = event.assistantMessageEvent;
-							if (delta?.type === "text_delta") {
+						const delta = event.assistantMessageEvent;
+						if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+							if (delta) {
 								// Stop collecting at MAX_OUTPUT_LENGTH to protect main context
 								if (collectedLength() >= MAX_OUTPUT_LENGTH) {
 									if (!outputTruncated) {
@@ -554,12 +553,10 @@ export default function (pi: ExtensionAPI) {
 				if (buffer.trim() && !outputTruncated) {
 					try {
 						const event = JSON.parse(buffer);
-						if (event.type === "message_update") {
-							const delta = event.assistantMessageEvent;
-							if (delta?.type === "text_delta") {
-								if (collectedLength() < MAX_OUTPUT_LENGTH) {
-									textChunks.push(delta.delta || "");
-								}
+						const delta = event.assistantMessageEvent;
+						if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
+							if (delta && collectedLength() < MAX_OUTPUT_LENGTH) {
+								textChunks.push(delta.delta || "");
 							}
 						}
 					} catch {}
