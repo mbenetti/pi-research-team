@@ -31,7 +31,22 @@ This is the recommended way for most users as it allows Pi to manage dependencie
    pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts
    ```
 
-3. **Enable Extensions Permanently (Optional)**:
+3. **Create Shell Aliases (Recommended for Convenience)**:
+   To avoid typing the long paths every time, you can add aliases to your shell configuration file (e.g., `~/.zshrc` or `~/.bashrc`):
+   ```bash
+   # Add these to your ~/.zshrc or ~/.bashrc
+   alias pi-research-team="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts"
+   alias pi-research-tui="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts"
+   alias pi-research-tree="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts"
+   ```
+   After saving, reload your shell (`source ~/.zshrc` or `source ~/.bashrc`). Now you can run any of the tools from anywhere with simple commands:
+   ```bash
+   pi-research-team "Conduct a multi-step research on solid-state battery limitations"
+   pi-research-tui "Ask the researcher to lookup the history of quantum physics"
+   pi-research-tree "Visualize the activity tree"
+   ```
+
+4. **Enable Extensions Permanently (Optional)**:
    If you want some of these extensions to load automatically with every standard `pi` execution, run the interactive configuration:
    ```bash
    pi config
@@ -112,6 +127,10 @@ graph TD
 * **How to test it**:
   Assign parallel research topics to the team in a single go:
   ```bash
+  # Using the alias (recommended):
+  pi-research-tui "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
+
+  # Or using the local path:
   pi -e extensions/research-tui.ts "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
   ```
   *Visual Behavior*: You will see both the **Researcher** and **Scientist** cards instantly light up with a `◉ researching` status concurrently. Their results are gathered in parallel and delivered together.
@@ -154,6 +173,10 @@ graph TD
 * **How to test it**:
   Assign a chained, multi-stage task:
   ```bash
+  # Using the alias (recommended):
+  pi-research-team "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
+
+  # Or using the local path:
   pi -e extensions/research-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
   ```
   *Visual Behavior*: The primary agent will draft a sequential plan. First, the **Researcher** card will highlight as it gathers data. Once finished, its results are piped to the **Scientist** (who analyzes them), then to the **Section-Writer** (who writes), and finally the **Critic** is dispatched sequentially to evaluate the outputs.
