@@ -1,3 +1,4 @@
+(!image)[/]
 # pi-research-team
 
 `pi-research-team` is a multi-agent system designed for conducting academic and technical research within the **Pi Coding Agent** framework. It orchestrates a specialized team of expert agents (Planner, Researcher, Scientist, Section Writer, Section Critic, and Research Manager) to streamline literature reviews, data extraction, analysis, draft development, and final report generation.
