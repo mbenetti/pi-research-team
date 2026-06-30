@@ -145,13 +145,16 @@ graph TD
 
 * **How to test it**:
   Assign parallel research topics to the team in a single go:
-  ```bash
-  # Using the alias (recommended):
-  pi-research-tui "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
 
-  # Or using the local path:
-  pi -e extensions/research-tui.ts "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
-  ```
+  * **Using the alias (recommended)**:
+    ```bash
+    pi-research-tui "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
+    ```
+
+  * **Using the local path**:
+    ```bash
+    pi -e extensions/research-tui.ts "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
+    ```
   *Visual Behavior*: You will see both the **Researcher** and **Scientist** cards instantly light up with a `◉ researching` status concurrently. Their results are gathered in parallel and delivered together.
 
 ---
@@ -191,13 +194,16 @@ graph TD
 
 * **How to test it**:
   Assign a chained, multi-stage task:
-  ```bash
-  # Using the alias (recommended):
-  pi-research-team "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
 
-  # Or using the local path:
-  pi -e extensions/research-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
-  ```
+  * **Using the alias (recommended)**:
+    ```bash
+    pi-research-team "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
+    ```
+
+  * **Using the local path**:
+    ```bash
+    pi -e extensions/research-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
+    ```
   *Visual Behavior*: The primary agent will draft a sequential plan. First, the **Researcher** card will highlight as it gathers data. Once finished, its results are piped to the **Scientist** (who analyzes them), then to the **Section-Writer** (who writes), and finally the **Critic** is dispatched sequentially to evaluate the outputs.
 
 ---
