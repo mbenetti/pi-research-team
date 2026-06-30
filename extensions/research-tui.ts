@@ -17,9 +17,9 @@ const packageRoot = join(__dirname, "..");
  * Usage: pi -e extensions/research-tui.ts
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
-import { Text, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { Text, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { spawn } from "child_process";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
