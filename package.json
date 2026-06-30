@@ -19,7 +19,7 @@
       "!extensions/themeMap.ts",
       "!extensions/research-tui.ts",
       "!extensions/research-tree.ts",
-      "!extensions/agent-team.ts"
+      "!extensions/research-team.ts"
     ],
     "prompts": ["prompts/*.md"],
     "skills": ["skills/*"],

@@ -20,7 +20,7 @@ This is the recommended way for most users as it allows Pi to manage dependencie
    You can invoke any extension on-demand without editing any configurations by referencing its global user location:
    ```bash
    # Multi-Agent Sequential Dispatcher (Deep Research)
-   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/agent-team.ts
+   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts
 
    # Parallel Team TUI (General Research)
    pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts
@@ -34,7 +34,7 @@ This is the recommended way for most users as it allows Pi to manage dependencie
    ```bash
    pi config
    ```
-   Navigate the interactive menus to toggle and permanently load the `agent-team`, `research-tree`, or `research-tui` extensions.
+   Navigate the interactive menus to toggle and permanently load the `research-team`, `research-tree`, or `research-tui` extensions.
 
 ---
 
@@ -56,7 +56,7 @@ Use this option if you want to inspect, customize, or contribute to the extensio
    Invoke the extensions relative to your current working directory:
    ```bash
    # Sequential Orchestrator
-   pi -e extensions/agent-team.ts
+   pi -e extensions/research-team.ts
 
    # Parallel Dashboard
    pi -e extensions/research-tui.ts
@@ -69,9 +69,9 @@ Use this option if you want to inspect, customize, or contribute to the extensio
 
 ## 🧠 Architectural Workflows: Sequential vs. Parallel
 
-At first glance, `agent-team.ts` and `research-tui.ts` render similar-looking interactive TUI grids. However, they represent **entirely different multi-agent coordination paradigms**:
+At first glance, `research-team.ts` and `research-tui.ts` render similar-looking interactive TUI grids. However, they represent **entirely different multi-agent coordination paradigms**:
 
-| Feature / Detail | `pi -e agent-team` (Sequential Chaining Model) | `pi -e research-tui` (Parallel Leader Model) |
+| Feature / Detail | `pi -e research-team` (Sequential Chaining Model) | `pi -e research-tui` (Parallel Leader Model) |
 | :--- | :--- | :--- |
 | **Primary Agent Role** | **Dispatcher Only.** The root agent has *zero* codebase tools. It acts as a pure coordinator, delegating everything. | **Active General.** The root agent acts as a lead author/compiler, retaining standard workspace files and terminal tools. |
 | **Execution Flow** | **Sequential / Dependency-Chained.** Spawns one agent at a time, reviews its output, and pipes it to the next agent. | **Parallel / Concurrent.** Spawns and executes multiple specialist agents *simultaneously* in parallel. |
@@ -116,7 +116,7 @@ graph TD
 
 ---
 
-### Use **`pi -e agent-team`** for Deep Research 🧬
+### Use **`pi -e research-team`** for Deep Research 🧬
 * **Ideal for**: Complex multi-stage workflows, formal literature reviews, writing deep papers, critical proofing, and recursive editing.
 * **Why it fits**: Rigorous research has **hard dependencies**. You cannot criticize a research methodology until the searcher has found and downloaded the source papers.
 
@@ -152,7 +152,7 @@ graph TD
 * **How to test it**:
   Assign a chained, multi-stage task:
   ```bash
-  pi -e extensions/agent-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
+  pi -e extensions/research-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
   ```
   *Visual Behavior*: The primary agent will draft a sequential plan. First, the **Researcher** card will highlight as it gathers data. Once finished, its results are piped to the **Scientist** (who analyzes them), then to the **Section-Writer** (who writes), and finally the **Critic** is dispatched sequentially to evaluate the outputs.
 
