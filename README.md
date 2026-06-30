@@ -87,6 +87,26 @@ At first glance, `agent-team.ts` and `research-tui.ts` render similar-looking in
 ### Use **`pi -e research-tui`** for General Research 🔍
 * **Ideal for**: Broader topics, rapid information retrieval, comparing opinions, and quick multi-perspective summaries.
 * **Why it fits**: It optimizes for **speed and breadth**. Assigning tasks linearly is slow; compiling parallel answers is fast.
+
+#### 📊 Parallel Workflow Diagram
+```mermaid
+graph TD
+    User([User Prompt]) --> Lead[Lead General Agent]
+    Lead --> Tool[query_researchers Tool]
+    
+    %% Concurrent execution branches
+    Tool -->|Concurrent Spawn| P1[Pi subagent: researcher]
+    Tool -->|Concurrent Spawn| P2[Pi subagent: scientist]
+    Tool -->|Concurrent Spawn| P3[Pi subagent: scout]
+    
+    P1 -->|Concurrent output| Gather[Gather & Combine Results]
+    P2 -->|Concurrent output| Gather
+    P3 -->|Concurrent output| Gather
+    
+    Gather --> Concl[Draft Multi-Perspective Summary]
+    Concl --> User
+```
+
 * **How to test it**:
   Assign parallel research topics to the team in a single go:
   ```bash
@@ -94,9 +114,41 @@ At first glance, `agent-team.ts` and `research-tui.ts` render similar-looking in
   ```
   *Visual Behavior*: You will see both the **Researcher** and **Scientist** cards instantly light up with a `◉ researching` status concurrently. Their results are gathered in parallel and delivered together.
 
+---
+
 ### Use **`pi -e agent-team`** for Deep Research 🧬
 * **Ideal for**: Complex multi-stage workflows, formal literature reviews, writing deep papers, critical proofing, and recursive editing.
 * **Why it fits**: Rigorous research has **hard dependencies**. You cannot criticize a research methodology until the searcher has found and downloaded the source papers.
+
+#### 📊 Sequential Chaining Workflow Diagram
+```mermaid
+graph TD
+    User([User Prompt]) --> Disp[Root Dispatcher Agent]
+    Disp --> Plan[1. Create Research Plan]
+    
+    %% Sequential Execution
+    Plan --> Step1[2. Dispatch Step 1: Researcher]
+    Step1 --> Sub1[Spawn subagent: researcher.md]
+    Sub1 --> Res1[Researcher Results]
+    Res1 --> Disp
+    
+    Disp --> Step2[3. Dispatch Step 2: Scientist]
+    Step2 --> Sub2[Spawn subagent: scientist.md<br>with Step 1 Results context]
+    Sub2 --> Res2[Scientist Critiques]
+    Res2 --> Disp
+    
+    Disp --> Step3[4. Dispatch Step 3: Section Writer]
+    Step3 --> Sub3[Spawn subagent: section-writer.md<br>with Critique context]
+    Sub3 --> Res3[Section Drafted]
+    Res3 --> Disp
+    
+    Disp --> Synthesize[5. Synthesize Final Full Report]
+    Synthesize --> User
+    
+    %% Recursive delegation block
+    Sub3 -.->|Supports Recursive Delegation<br>'DELEGATE:critic'| Disp
+```
+
 * **How to test it**:
   Assign a chained, multi-stage task:
   ```bash
