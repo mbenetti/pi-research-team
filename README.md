@@ -20,16 +20,21 @@ This is the recommended way for most users as it allows Pi to manage dependencie
 
 2. **Run extensions explicitly**:
    You can invoke any extension on-demand without editing any configurations by referencing its global user location:
-   ```bash
-   # Multi-Agent Sequential Dispatcher (Deep Research)
-   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts
 
-   # Parallel Team TUI (General Research)
-   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts
+   * **Multi-Agent Sequential Dispatcher (Deep Research)**:
+     ```bash
+     pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts
+     ```
 
-   # Visual Activity Tree
-   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts
-   ```
+   * **Parallel Team TUI (General Research)**:
+     ```bash
+     pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts
+     ```
+
+   * **Visual Activity Tree**:
+     ```bash
+     pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts
+     ```
 
 3. **Create Shell Aliases (Recommended for Convenience)**:
    To avoid typing the long paths every time, you can add aliases to your shell configuration file (e.g., `~/.zshrc` or `~/.bashrc`):
