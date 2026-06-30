@@ -1,109 +1,69 @@
-# 🔬 Pi Research Team
+# 🔬 pi-research-team: An Autonomous Multi-Agent Research Framework
 
-A visual, multi-agent academic research pipeline with information compartmentalization.
+The `pi-research-team` project provides a sophisticated, autonomous multi-agent system designed to streamline the academic research process. Leveraging the `pi` coding agent framework, this project orchestrates a team of specialized agents—including a Planner, Research Manager, Researcher, Scientist, Section Writer, and Section Critic—to conduct comprehensive literature reviews, extract information, and generate research reports.
 
-## Features
+This framework is built to handle complex research tasks, from initial information discovery to the drafting and refinement of academic sections, all while maintaining strict information compartmentalization between agent roles.
 
-- 🖥️ **Interactive TUI Dashboard**: Monitor sub-agents in real-time on a split-screen Dracula TUI grid.
-- 🧱 **Information Isolation**: Protects your LLM context window! Sub-agents analyze high-density records and forward metadata or summaries, and only the specialist `scientist` reads high-resolution full-text contents.
-- 🔍 **Hybrid Search Fork**: Tavily API web search with automated local Ollama search fallback.
-- 📄 **LiteParse Extraction**: Downloads PDFs and parses spatial layouts and tables into prompt-clean Markdown.
-- ⚡ **Parallel Multi-Agent Execution**: Run multiple specialist agents simultaneously while tracking progress, tool activity, and responses dynamically.
+## ✨ Features
 
-## Installation
+*   **Multi-Agent Orchestration:** A well-defined team of agents collaborating on research tasks.
+*   **Role-Restricted Information Access:** Ensures agents only access information relevant to their role, promoting secure and focused processing.
+*   **Automated Research Workflow:** Automates steps like paper search, PDF content extraction, citation analysis, and report generation.
+*   **Extensible Skills:** Utilizes `pi` skills for specialized tasks such as web search, document parsing (LiteParse), and full document access (for authorized agents).
+*   **Modular Design:** Easy to extend and adapt for different research domains or workflows.
 
-Both dashboards are installed together as a single package. Run this inside your Pi terminal to install them:
+## 🚀 Installation
+
+To get started with `pi-research-team`, follow these steps:
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/mbenetti/pi-research-team.git
+    cd pi-research-team
+    ```
+
+2.  **Ensure `pi` is Installed:**
+    This project requires the `pi` coding agent. If you don't have `pi` installed globally, please refer to its official documentation for installation instructions:
+    ```bash
+    # Example: If pi is an npm package
+    npm install -g @earendil-works/pi-coding-agent
+    ```
+    *Note: This project has been migrated to utilize the `@earendil-works` namespace for the `pi` coding agent, reflecting updates in the `pi` ecosystem and ensuring compatibility with the latest features and improvements.*
+
+3.  **Configure Environment Variables:**
+    Some skills and tools (e.g., `web_search`) may require API keys (e.g., `TAVILY_API_KEY`). Ensure these are set in your environment or a `.env` file.
+
+## 🔌 Using Extensions
+
+It's crucial to understand that **`pi` extensions (such as `agent-team.ts`) are disabled by default** for security and performance reasons. To leverage the full multi-agent capabilities of `pi-research-team`, you must explicitly enable the `agent-team.ts` extension when invoking `pi`.
+
+### How to Run with Extensions
+
+To run the multi-agent research pipeline, you need to execute `pi` with the `-e` flag, specifying the `agent-team.ts` extension:
+
 ```bash
-pi install git:github.com/mbenetti/pi-research-team.git
+pi -e agent-team.ts
 ```
 
-## Running the Team
+This command will activate the `agent-team.ts` extension, which is responsible for orchestrating the different agents (Planner, Research Manager, Researcher, Scientist, etc.) as defined in your `agents/` directory and `teams.yaml` configuration. Without this flag, `pi` will operate in a single-agent mode, and the multi-agent collaborative features will not be active.
 
-Ensure you have initialized the dependencies (`npm i -g @llamaindex/liteparse` for PDF processing). 
+## 📝 Example Queries
 
-This package includes two visual dashboards for monitoring the research process. You can run one or the other:
+Once the `pi` agent is running with the `agent-team.ts` extension, you can interact with it using natural language queries to initiate research tasks. Here are some examples:
 
-### 1. Grid/Tiles Dashboard (Default)
-Monitors loaded sub-agents' detailed session states, elapsed execution timers, context % size, and active statuses as side-by-side terminal tiles. This runs automatically on `pi` boot if installed locally:
-```bash
-pi
-```
-Or you can point to it explicitly:
-```bash
-pi -e extensions/agent-team.ts
-```
+*   **Initiate a literature review:**
+    `@research-manager "Conduct a comprehensive literature review on the latest advancements in quantum machine learning, focusing on applications in materials science."`
 
-### 2. Tree/List Dashboard
-Shows a compact, multi-line tree overview of sub-agents with activity badges, tool icons, and live task statuses. This is ideal for smaller screens:
-```bash
-pi -e extensions/research-tree.ts
-```
+*   **Request a specific section of a report:**
+    `@planner "Generate a background section for a paper on federated learning for medical imaging, including key challenges and recent solutions."`
 
----
+*   **Ask the researcher to find specific information:**
+    `@researcher "Find abstracts and metadata for papers published in the last two years on explainable AI in computer vision."`
 
-## 💡 Designing a Research Query: Minimum Viable Research Query (MVRQ)
+*   **Delegate a deep analysis task to the scientist:**
+    `@scientist "Analyze the methodologies and statistical approaches used in the top 3 most cited papers on reinforcement learning for robotics."`
 
-To get high-quality results from the multi-agent team and avoid unfocused browser searches or irrelevant paper processing, use a **Minimum Viable Research Query (MVRQ)** structure. A complete query should contain:
-1. **Topic**: The core subject or comparison.
-2. **Scope**: Specific sub-topics to include and explicit exclusions.
-3. **Depth/Timeframe**: Preferred publication years and study types (e.g. clinical trials, SOTA).
-4. **Output Requirement**: Expected figures, tables, or comparative indices.
+*   **Request content generation:**
+    `@section-writer "Write an introduction to a review paper about the societal impact of large language models."`
 
-### MVRQ Example:
-> **Topic**: Direct Preference Optimization (DPO) vs. RLHF in LLM alignment.  
-> **Scope**: Focus on computational efficiency and training stability comparisons. Exclude non-text LLM alignment (multimodal DPO).  
-> **Depth**: Include at least 3 foundational papers (e.g., Rafailov et al.) and at least 2 recent empirical reviews (2024).  
-> **Output**: A comparative evaluation table summarizing computation times and resource requirements.
-
----
-
-## 🔄 Pre-Planning Clarification Workflow
-
-When a query is ambiguous, the team is equipped to perform a **Pre-Planning Clarification Step** before handing the task to the `planner`. This prevents wasteful token usage and keeps your research highly targeted.
-
-```
- User ──> [Research Manager / Analyst] ──> Needs Clarification? (Ask questions)
-                                                         │
- User <── Feedback / Criteria Answers ───────────────────┘
-   │
-   └──> [Research Manager] ──> Formulate Goal ──> [planner] ──> Start Execution
-```
-
-1. **Clarification Stage (`prompts/clarify-research.md`)**:
-   If a general query like *"Research AI in healthcare"* is received, the Manager uses the clarification prompt to generate 2-3 targeted questions detailing:
-   * **Scope**: What specific sub-topics/applications (e.g., diagnostic imaging vs. drug discovery)?
-   * **Depth**: Are we looking for foundational papers or state-of-the-art advances?
-   * **Timeframe**: Focus on general history or recent papers (last 2 years)?
-   * **Use case**: Literature review, thesis reference, or general learning?
-
-2. **Goal Formation (`prompts/create-goal.md`)**:
-   Once the answers are returned, the manager creates a highly structured **Research Goal** detailing objective boundaries, success criteria, and targets.
-
-3. **Planning Stage**:
-   The finalized Research Goal is given to the `planner` to design an execution roadmap for the `researcher`, `scientist`, `section-writer`, and `section-critic` agents.
-
----
-
-## Available Agents & Parallel Execution
-
-The repository configures a set of specialized sub-agents with unique system prompts and tool access:
-
-- **Planner**: Generates structured, step-by-step implementation plans for complex topics.
-- **Research Manager**: Oversees the research scope and synthesizes findings into the final report.
-- **Researcher**: Explores and downloads source materials; has strict memory limits (reads abstracts and first 50 lines).
-- **Scientist**: Performs deep paper analysis with full-document access (methodology, results, tables).
-- **Section Writer**: Produces publication-ready academic content with consistent [Author, Year] formatting.
-- **Section Critic**: Evaluates written draft sections for precision, accuracy, and formatting checkpoints.
-
-In the **Tree/List Dashboard**, any agent can invoke the `query_tree_researchers` tool to launch parallel, concurrent subprocesses querying multiple specialists at the same time:
-```ts
-query_tree_researchers({
-  queries: [
-    { agent: "researcher", question: "Research the exact speed of light..." },
-    { agent: "scientist", question: "Provide a rigorous definition of gravity..." }
-  ]
-})
-```
-This safely manages isolation boundaries, intercepts execution logs, and routes the summarized results cleanly back to the manager's context.
-
-*These dashboards will prompt you to select a starting roster (e.g. `research-team`) and activate visual panels in your view.*
+These queries demonstrate how to address specific agents to delegate tasks, enabling a fine-grained control over the research process initiated by the `pi` framework.
