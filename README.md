@@ -1,83 +1,113 @@
 # pi-research-team
 
-This project provides a multi-agent system for conducting academic research within the pi coding agent framework. It orchestrates a team of specialized agents (Researcher, Scientist, Section Writer, etc.) to streamline the literature review, data extraction, analysis, and report generation processes. The system is designed to handle complex research queries by breaking them down into manageable tasks for each agent, enhancing efficiency and collaboration in academic workflows.
+`pi-research-team` is a multi-agent system designed for conducting academic and technical research within the **Pi Coding Agent** framework. It orchestrates a specialized team of expert agents (Planner, Researcher, Scientist, Section Writer, Section Critic, and Research Manager) to streamline literature reviews, data extraction, analysis, draft development, and final report generation.
 
 ---
 
-## Installation
+## 🚀 Installation & Running Options
 
-You have two primary options for installing and running `pi-research-team`:
+By default, all extensions in this repository are **disabled on standard `pi` startups** to keep your standard runs fast and lightweight. You can use this package via one of the two options below:
 
 ### Option 1: Global Installation (Via `pi install`)
+This is the recommended way for most users as it allows Pi to manage dependencies, updates, and global availability.
 
-This method is recommended for most users as it allows pi to manage the installation and updates.
+1. **Install the package globally**:
+   ```bash
+   pi install git:github.com/mbenetti/pi-research-team.git
+   ```
 
-1.  **Install with `pi install`**:
-    Install the `pi-research-team` package globally using the `pi install` command. This will clone the repository and make the extensions available to your pi environment.
+2. **Run extensions explicitly**:
+   You can invoke any extension on-demand without editing any configurations by referencing its global user location:
+   ```bash
+   # Multi-Agent Sequential Dispatcher (Deep Research)
+   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/agent-team.ts
 
-    ```bash
-    pi install git:github.com/mbenetti/pi-research-team.git
-    ```
+   # Parallel Team TUI (General Research)
+   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts
 
-2.  **Running Extensions Explicitly**:
-    After installation, you can run the extensions directly by referencing their paths within your `~/.pi` directory. This is useful for testing without modifying your `pi config` permanently.
+   # Visual Activity Tree
+   pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts
+   ```
 
-    ```bash
-    pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/agent-team.ts
-    pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts
-    pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts
-    ```
-
-3.  **Optional: Using `pi config` to Toggle Resources**:
-    For a more integrated experience, you can use `pi config` to interactively enable these extensions. This will add them to your `~/.pi/config` file, so they are loaded automatically every time `pi` starts.
-
-    ```bash
-    pi config
-    ```
-    Navigate through the interactive configuration utility to enable the `agent-team.ts`, `research-tree.ts`, and `research-tui.ts` extensions.
-
-### Option 2: Local Installation (Cloning and Pointing Locally)
-
-This method is ideal for developers or users who want to modify and experiment with the `pi-research-team` source code directly.
-
-1.  **Clone the Repository and Navigate**:
-    First, clone the `pi-research-team` repository from GitHub and change into the project directory.
-
-    ```bash
-    git clone https://github.com/mbenetti/pi-research-team.git
-    cd pi-research-team
-    ```
-
-2.  **Install Dependencies**:
-    Install the necessary Node.js dependencies using `npm`.
-
-    ```bash
-    npm install
-    ```
-
-3.  **Run Local Extensions Directly**:
-    Once dependencies are installed, you can run the extensions relative to your current working directory.
-
-    ```bash
-    pi -e extensions/agent-team.ts
-    pi -e extensions/research-tree.ts
-    pi -e extensions/research-tui.ts
-    ```
+3. **Enable Extensions Permanently (Optional)**:
+   If you want some of these extensions to load automatically with every standard `pi` execution, run the interactive configuration:
+   ```bash
+   pi config
+   ```
+   Navigate the interactive menus to toggle and permanently load the `agent-team`, `research-tree`, or `research-tui` extensions.
 
 ---
 
-## Up-to-date Scope Notes
+### Option 2: Local Installation (For Developers)
+Use this option if you want to inspect, customize, or contribute to the extensions directly.
 
-This iteration of `pi-research-team` has undergone significant updates, including a transition from the deprecated `@mariozechner/*` dependencies and internal modules to the current `@earendil-works/*` scope. This change ensures better maintainability, compatibility, and ongoing support. Additionally, all identified security vulnerabilities have been addressed and resolved to provide a more stable and secure research environment.
+1. **Clone the repository and enter the directory**:
+   ```bash
+   git clone https://github.com/mbenetti/pi-research-team.git
+   cd pi-research-team
+   ```
+
+2. **Install local dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Run local extensions explicitly**:
+   Invoke the extensions relative to your current working directory:
+   ```bash
+   # Sequential Orchestrator
+   pi -e extensions/agent-team.ts
+
+   # Parallel Dashboard
+   pi -e extensions/research-tui.ts
+
+   # Tree Visualizer
+   pi -e extensions/research-tree.ts
+   ```
 
 ---
 
-## Example Queries for the Multi-Agent System
+## 🧠 Architectural Workflows: Sequential vs. Parallel
 
-Here are some example queries you can provide to the `pi-research-team` multi-agent system to kickstart its research capabilities:
+At first glance, `agent-team.ts` and `research-tui.ts` render similar-looking interactive TUI grids. However, they represent **entirely different multi-agent coordination paradigms**:
 
-*   "Conduct a literature review on the latest advancements in quantum computing for drug discovery."
-*   "Summarize recent research regarding the impact of climate change on ocean biodiversity, focusing on studies published in the last five years."
-*   "Analyze different deep learning architectures used for medical image segmentation and identify their pros and cons."
-*   "Investigate the effectiveness of various reinforcement learning algorithms in managing smart grid energy distribution."
-*   "Generate a report on the ethical considerations surrounding the deployment of large language models in educational settings."
+| Feature / Detail | `pi -e agent-team` (Sequential Chaining Model) | `pi -e research-tui` (Parallel Leader Model) |
+| :--- | :--- | :--- |
+| **Primary Agent Role** | **Dispatcher Only.** The root agent has *zero* codebase tools. It acts as a pure coordinator, delegating everything. | **Active General.** The root agent acts as a lead author/compiler, retaining standard workspace files and terminal tools. |
+| **Execution Flow** | **Sequential / Dependency-Chained.** Spawns one agent at a time, reviews its output, and pipes it to the next agent. | **Parallel / Concurrent.** Spawns and executes multiple specialist agents *simultaneously* in parallel. |
+| **Primary Tool** | `dispatch_agent` (invokes a single agent for a specific step) | `query_researchers` (concurrently runs queries across multiple sub-agents) |
+| **Recursive Delegation** | **Supported.** Sub-agents can run their own sub-dispatches recursively using `[DELEGATE:scientist]` blocks. | **Not Supported.** Execution returns directly to the leader agent; no nested/recursive delegation. |
+| **Tools Lock** | Locks down session tools exclusively to `dispatch_agent` for safety. | Standard shell tools are fully available to the lead agent. |
+| **Commands** | `/agents-team` (switch active team)<br>`/agents-list` (list states)<br>`/agents-grid N` (set grid columns) | `/team <name>` (load custom team)<br>`/researchers` (status table)<br>`/research-grid N` (set columns) |
+
+---
+
+## 📈 Choosing the Right Mode for Your Query
+
+### Use **`pi -e research-tui`** for General Research 🔍
+* **Ideal for**: Broader topics, rapid information retrieval, comparing opinions, and quick multi-perspective summaries.
+* **Why it fits**: It optimizes for **speed and breadth**. Assigning tasks linearly is slow; compiling parallel answers is fast.
+* **How to test it**:
+  Assign parallel research topics to the team in a single go:
+  ```bash
+  pi -e extensions/research-tui.ts "Ask the researcher to lookup the history of quantum physics, and the scientist to draft physical definitions of gravity"
+  ```
+  *Visual Behavior*: You will see both the **Researcher** and **Scientist** cards instantly light up with a `◉ researching` status concurrently. Their results are gathered in parallel and delivered together.
+
+### Use **`pi -e agent-team`** for Deep Research 🧬
+* **Ideal for**: Complex multi-stage workflows, formal literature reviews, writing deep papers, critical proofing, and recursive editing.
+* **Why it fits**: Rigorous research has **hard dependencies**. You cannot criticize a research methodology until the searcher has found and downloaded the source papers.
+* **How to test it**:
+  Assign a chained, multi-stage task:
+  ```bash
+  pi -e extensions/agent-team.ts "Conduct a multi-step research on solid-state battery limitations, write a draft of the report, and then deeply criticize it"
+  ```
+  *Visual Behavior*: The primary agent will draft a sequential plan. First, the **Researcher** card will highlight as it gathers data. Once finished, its results are piped to the **Scientist** (who analyzes them), then to the **Section-Writer** (who writes), and finally the **Critic** is dispatched sequentially to evaluate the outputs.
+
+---
+
+## 🛠️ Package Updates (v1.0.0)
+
+* **Official `@earendil-works` Scope**: All core imports and `package.json` peer dependencies have been successfully migrated from the deprecated `@mariozechner` scopes to official packages.
+* **0 Vulnerabilities**: All package version mismatches and high/moderate security weaknesses have been completely patched.
+* **Lightweight Standard Execution**: By default, no resource-heavy dashboards load when you run a standard `pi` task, preventing terminal overhead until explicitly requested with the `-e` flag.
