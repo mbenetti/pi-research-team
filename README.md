@@ -44,11 +44,21 @@ This is the recommended way for most users as it allows Pi to manage dependencie
    alias pi-research-tree='pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts'
    ```
    After saving, reload your shell (`source ~/.zshrc` or `source ~/.bashrc`). Now you can run any of the tools from anywhere with simple commands:
-   ```bash
-   pi-research-team "Conduct a multi-step research on solid-state battery limitations"
-   pi-research-tui "Ask the researcher to lookup the history of quantum physics"
-   pi-research-tree "Visualize the activity tree"
-   ```
+
+   * **Deep Research**:
+     ```bash
+     pi-research-team "Conduct a multi-step research on solid-state battery limitations"
+     ```
+
+   * **General Research**:
+     ```bash
+     pi-research-tui "Ask the researcher to lookup the history of quantum physics"
+     ```
+
+   * **Visual Activity Tree**:
+     ```bash
+     pi-research-tree "Visualize the activity tree"
+     ```
 
 4. **Enable Extensions Permanently (Optional)**:
    If you want some of these extensions to load automatically with every standard `pi` execution, run the interactive configuration:
