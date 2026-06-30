@@ -85,16 +85,21 @@ Use this option if you want to inspect, customize, or contribute to the extensio
 
 3. **Run local extensions explicitly**:
    Invoke the extensions relative to your current working directory:
-   ```bash
-   # Sequential Orchestrator
-   pi -e extensions/research-team.ts
 
-   # Parallel Dashboard
-   pi -e extensions/research-tui.ts
+   * **Sequential Orchestrator**:
+     ```bash
+     pi -e extensions/research-team.ts
+     ```
 
-   # Tree Visualizer
-   pi -e extensions/research-tree.ts
-   ```
+   * **Parallel Dashboard**:
+     ```bash
+     pi -e extensions/research-tui.ts
+     ```
+
+   * **Tree Visualizer**:
+     ```bash
+     pi -e extensions/research-tree.ts
+     ```
 
 ---
 
