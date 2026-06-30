@@ -35,9 +35,9 @@ This is the recommended way for most users as it allows Pi to manage dependencie
    To avoid typing the long paths every time, you can add aliases to your shell configuration file (e.g., `~/.zshrc` or `~/.bashrc`):
    ```bash
    # Add these to your ~/.zshrc or ~/.bashrc
-   alias pi-research-team="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts"
-   alias pi-research-tui="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts"
-   alias pi-research-tree="pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts"
+   alias pi-research-team='pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-team.ts'
+   alias pi-research-tui='pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tui.ts'
+   alias pi-research-tree='pi -e ~/.pi/agent/git/github.com/mbenetti/pi-research-team/extensions/research-tree.ts'
    ```
    After saving, reload your shell (`source ~/.zshrc` or `source ~/.bashrc`). Now you can run any of the tools from anywhere with simple commands:
    ```bash
