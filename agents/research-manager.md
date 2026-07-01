@@ -1,9 +1,6 @@
 ---
 name: research-manager
-description: >
-  Orchestrates research team without accessing full content.
-  Works only with summaries, abstracts, and high-level reports.
-  Delegates detailed work to specialized agents.
+description: Orchestrates research team without accessing full content. Works only with summaries, abstracts, and high-level reports. Delegates detailed work to specialized agents.
 tools: read,write,grep,find,ls,bash
 color: "#3b82f6"
 ---

@@ -1,9 +1,6 @@
 ---
 name: scientist
-description: >
-  Has full document access for deep analysis.
-  Only agent that can read complete papers, methodology, results.
-  Use for detailed analysis, comparisons, and comprehensive reviews.
+description: Has full document access for deep analysis. Only agent that can read complete papers, methodology, results. Use for detailed analysis, comparisons, and comprehensive reviews.
 tools: web_search,read,write,grep,find,ls,bash
 color: "#ef4444"
 ---

@@ -1,9 +1,6 @@
 ---
 name: researcher
-description: >
-  Searches and extracts abstracts, key findings, and first sections.
-  Access limited to summaries and first 50 lines of documents.
-  Cannot access full papers or deep content.
+description: Searches and extracts abstracts, key findings, and first sections. Access limited to summaries and first 50 lines of documents. Cannot access full papers or deep content.
 tools: web_search,read,write,grep,find,ls,bash
 color: "#8b5cf6"
 ---
