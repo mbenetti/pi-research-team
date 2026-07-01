@@ -1,28 +1,23 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const packageRoot = join(__dirname, "..");
 /**
- * Research Tree — Tree-style TUI dashboard for research teams
+ * Research Tree - A tree-style TUI dashboard for research teams
  *
- * Shows one line per agent with activity indicators (activity icons,
- * elapsed time, tool count) and colored agent names from frontmatter colors.
- *
- * Commands:
- *   /research-tree [team] — load team from teams.yaml (default: research-team)
- *   /tree-status          — show current tree state and agent status
+ * Shows one line per agent with activity indicators:
+ *   ● = researching  ✓ = done  ○ = idle  ✗ = error
+ *   📄 context loaded  🔍 web search  ✏️ writing  ⚙️ tool running
+ *   ⏱ elapsed time  │ metadata columns
  *
  * Usage: pi -e extensions/research-tree.ts
+ * Commands:
+ *   /research-tree [team] - load team from teams.yaml (default: research-team)
+ *   /tree-status          - show current tree state
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Text, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { Type } from "@sinclair/typebox";
-import { spawn } from "child_process";
-import { readFileSync, existsSync, appendFileSync, writeFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { applyExtensionDefaults } from "./themeMap.ts";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -120,13 +115,10 @@ function parseTeamsYaml(filePath: string): Record<string, string[]> {
   }
 }
 
-const FG_RESET = "\x1b[39m";
-const BG_RESET = "\x1b[49m";
-
 function hexToAnsiParams(hex: string): { bg: string; br: string } {
-  if (!hex) return { bg: "\x1b[48;2;28;42;80m", br: "\x1b[38;2;85;120;210m" };
+  if (!hex) return { bg: "", br: "" };
   const clean = hex.replace("#", "");
-  if (clean.length !== 6) return { bg: "\x1b[48;2;28;42;80m", br: "\x1b[38;2;85;120;210m" };
+  if (clean.length !== 6) return { bg: "", br: "" };
 
   const r = parseInt(clean.substring(0, 2), 16);
   const g = parseInt(clean.substring(2, 4), 16);
@@ -193,6 +185,12 @@ function activityIconToEmoji(icon: ActivityIcon): string {
   }
 }
 
+function truncate(text: string, maxLen: number): string {
+  const clean = text.replace(/[\r\n\t]/g, " ");
+  if (visibleWidth(clean) <= maxLen) return clean;
+  return truncateToWidth(clean, maxLen - 3) + "...";
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
 const state = {
@@ -207,8 +205,7 @@ export default function (pi: ExtensionAPI) {
   let teamLoaded = false;
 
   function loadTeam(cwd: string, teamName: string) {
-    let agentsDir = join(cwd, ".pi", "agents");
-    if (!existsSync(join(agentsDir, "teams.yaml"))) agentsDir = join(packageRoot, "agents");
+    const agentsDir = join(cwd, ".pi", "agents");
     const teamsFile = join(agentsDir, "teams.yaml");
 
     state.agents.clear();
@@ -256,12 +253,6 @@ export default function (pi: ExtensionAPI) {
     teamLoaded = true;
   }
 
-  function truncateTo(str: string, maxLen: number): string {
-    const clean = str.replace(/[\r\n\t]/g, " ");
-    if (visibleWidth(clean) <= maxLen) return clean;
-    return truncateToWidth(clean, maxLen - 3) + "...";
-  }
-
   function updateWidget() {
     if (!state.widgetCtx || !teamLoaded) return;
 
@@ -281,7 +272,7 @@ export default function (pi: ExtensionAPI) {
         const header = theme.fg("accent", theme.bold("  Research Team"))
           + theme.fg("dim", `  │  ${state.currentTeam}`);
         lines.push(header);
-        lines.push(theme.fg("dim", "  " + "─".repeat(Math.min(60, Math.floor(width / 3)))));
+        lines.push(theme.fg("dim", "  ─".repeat(Math.min(60, Math.floor(width / 3)))));
 
         // Agent lines
         for (const [key, agent] of state.agents) {
@@ -339,26 +330,24 @@ export default function (pi: ExtensionAPI) {
     }
 
     // Count tools used for metadata
-    const totalTools = Object.values(activity.toolCount).reduce((a, b) => a + b as number, 0) as number;
+    const totalTools = Object.values(activity.toolCount).reduce((a, b) => a + b, 0);
     if (totalTools > 0 && badges.length === 0) {
       badges.push(activityIconToEmoji("custom"));
     }
 
-    // Fixed-width badge column (8 chars) — only show most recent 2 icons
+    // FIX: Fixed-width badge column (8 chars) — only show most recent 2 icons
     const MAX_BADGES = 2;
     const badgeText = badges.slice(0, MAX_BADGES).join("") || "  ";
     const badgeVisible = visibleWidth(badgeText);
     const badgeWidth = 8; // Fixed column width
 
-    // Name with color (use agent's custom color via ANSI if available)
-    const nameStr = color.br
-      ? color.br + theme.bold(def.displayName) + FG_RESET
-      : theme.fg("accent", theme.bold(def.displayName));
+    // Name with background color
+    const nameStr = theme.fg("accent", theme.bold(def.displayName));
     const nameVisible = visibleWidth(nameStr);
 
     // Current task (truncate to remaining space)
     const remaining = Math.max(15, maxWidth - nameVisible - badgeWidth - 14);
-    const taskText = truncateTo(activity.currentTask || def.description, remaining);
+    const taskText = truncate(activity.currentTask || def.description, remaining);
 
     // Time + tool count
     const elapsedText = activity.startTime
@@ -370,7 +359,7 @@ export default function (pi: ExtensionAPI) {
 
     // Compose line with FIXED COLUMNS
     const bg = color.bg ? color.bg : "";
-    const bgR = color.bg ? BG_RESET : "";
+    const bgR = color.bg ? "\x1b[49m" : "";
 
     const colorize = (s: string, c: string) => {
       return (bg ? bg : "") + theme.fg(c, s) + (bg ? bgR : "");
@@ -378,15 +367,13 @@ export default function (pi: ExtensionAPI) {
 
     // Column 1: Status icon (4 chars)
     let line = colorize(`  ${statusIcon} `, statusColor);
-
+    
     // Column 2: Activity badges (fixed 8-char column, left-aligned with padding)
     const padBadge = " ".repeat(Math.max(0, badgeWidth - badgeVisible));
     line += colorize(badgeText + padBadge, status === "researching" ? "accent" : "dim");
-
-    // Column 3: Agent name (bold, accent color or custom color)
-    line += color.br
-      ? nameStr
-      : colorize(nameStr, "accent");
+    
+    // Column 3: Agent name (bold, accent color)
+    line += colorize(nameStr, "accent");
 
     // Column 4: Task (muted, truncated)
     if (taskText) {
@@ -403,10 +390,27 @@ export default function (pi: ExtensionAPI) {
 
   // ── Event Handlers for Activity Tracking ─────────────────────────────
 
+  function getAgentForTool(toolName: string): string | null {
+    // Heuristic: match tool to agent based on the agent's declared tools
+    // For multi-agent parallel queries, we track which agent is doing what
+    // via the query_researchers tool's sub-processes
+    // Currently, this is a best-effort mapping
+    for (const [key, agent] of state.agents) {
+      if (agent.def.tools.some(t => toolName.includes(t.toLowerCase()) || t.toLowerCase().includes(toolName.toLowerCase()))) {
+        return key;
+      }
+    }
+    // Fallback: assign to first researching agent
+    for (const [key, agent] of state.agents) {
+      if (agent.status === "researching") return key;
+    }
+    return null;
+  }
+
   // Track context loading
-  pi.on("context", async (event, _ctx) => {
+  pi.on("context", async (event, ctx) => {
     const msgCount = event.messages?.length || 0;
-    for (const [_key, agent] of state.agents) {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         agent.activity.contextLoaded = true;
         agent.activity.currentTask = `Context: ${msgCount} messages`;
@@ -416,8 +420,8 @@ export default function (pi: ExtensionAPI) {
   });
 
   // Track tool execution starts
-  pi.on("tool_execution_start", async (event, _ctx) => {
-    for (const [_key, agent] of state.agents) {
+  pi.on("tool_execution_start", async (event, ctx) => {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         agent.status = "researching";
         agent.activity.lastTool = event.toolName;
@@ -433,20 +437,20 @@ export default function (pi: ExtensionAPI) {
   });
 
   // Track tool results (completion)
-  pi.on("tool_result", async (event, _ctx) => {
-    for (const [_key, agent] of state.agents) {
+  pi.on("tool_result", async (event, ctx) => {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         const content = event.content?.[0]?.text || "";
-        const contentLines = content.split("\n").filter(l => l.trim());
-        agent.activity.lastOutputLine = contentLines[contentLines.length - 1]?.slice(0, 80) || "";
+        const lines = content.split("\n").filter(l => l.trim());
+        agent.activity.lastOutputLine = lines[lines.length - 1]?.slice(0, 80) || "";
         agent.activity.currentTask = agent.activity.lastOutputLine || event.toolName;
         updateWidget();
       }
     }
   });
 
-  pi.on("tool_execution_end", async (_event, _ctx) => {
-    for (const [_key, agent] of state.agents) {
+  pi.on("tool_execution_end", async (event, ctx) => {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         agent.activity.elapsed = Date.now() - (agent.activity.startTime || Date.now());
         updateWidget();
@@ -455,28 +459,28 @@ export default function (pi: ExtensionAPI) {
   });
 
   // Track agent turns
-  pi.on("turn_start", async (_event, _ctx) => {
-    for (const [_key, agent] of state.agents) {
+  pi.on("turn_start", async (event, ctx) => {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         agent.activity.startTime = Date.now();
       }
     }
   });
 
-  pi.on("turn_end", async (_event, _ctx) => {
-    for (const [_key, agent] of state.agents) {
+  pi.on("turn_end", async (event, ctx) => {
+    for (const [key, agent] of state.agents) {
       if (agent.status === "researching") {
         agent.activity.elapsed = Date.now() - (agent.activity.startTime || Date.now());
       }
     }
   });
 
-  // ── query_tree_researchers Tool ───────────────────────────────────────────
+  // ── query_researchers Tool ───────────────────────────────────────────
 
   pi.registerTool({
-    name: "query_tree_researchers",
+    name: "query_researchers",
     label: "Query Researchers",
-    description: "Query one or more research agents IN PARALLEL. All agents run simultaneously as concurrent subprocesses.\nPass an array of queries — each with an agent name and a specific question. All agents start at the same time and their results are returned together.",
+    description: "Query one or more research agents IN PARALLEL. All agents run simultaneously as concurrent subprocesses.\nPass an array of queries - each with an agent name and a specific question. All experts start at the same time and their results are returned together.",
 
     parameters: Type.Object({
       queries: Type.Array(
@@ -490,11 +494,6 @@ export default function (pi: ExtensionAPI) {
 
     async execute(_toolCallId, params, _signal, onUpdate, ctx) {
       const { queries } = params as { queries: { agent: string; question: string }[] };
-
-      // Reset all agents to idle before starting a new batch of parallel queries
-      for (const [_, agent] of state.agents) {
-        agent.status = "idle";
-      }
 
       if (!queries || queries.length === 0) {
         return {
@@ -515,7 +514,7 @@ export default function (pi: ExtensionAPI) {
         queries.map(async ({ agent, question }) => {
           const result = await queryResearcher(agent, question, ctx);
           const truncated = result.output.length > 12000
-            ? result.output.slice(0, 12000) + "\n\n... [truncated — ask follow-up for more]"
+            ? result.output.slice(0, 12000) + "\n\n... [truncated - ask follow-up for more]"
             : result.output;
           const status = result.exitCode === 0 ? "done" : "error";
           return {
@@ -561,8 +560,9 @@ export default function (pi: ExtensionAPI) {
       // Return only metadata/summaries. Full content stored in `details` for expand-only.
       const summaryLines = results.map((r, i) => {
         const icon = r.status === "done" ? "✓" : "✗";
+        // Extract a brief summary - first 200 chars of output, or a meaningful snippet
         const brief = r.output
-          ? r.output.split(/\n/).filter((l: string) => l.trim()).slice(0, 3).join(" | ").slice(0, 200)
+          ? r.output.split(/\n/).filter((l: string) => l.trim()).slice(0, 3).join(" \n ").slice(0, 200)
           : "(no output)";
         return `${icon} [${i + 1}] ${displayName(r.agent)} (${Math.round(r.elapsed / 1000)}s): ${brief}`;
       });
@@ -580,9 +580,9 @@ export default function (pi: ExtensionAPI) {
       const queries = (args as any).queries || [];
       const names = queries.map((q: any) => displayName(q.agent || "?")).join(", ");
       return new Text(
-        theme.fg("toolTitle", theme.bold("query_tree_researchers ")) +
+        theme.fg("toolTitle", theme.bold("query_researchers ")) +
         theme.fg("accent", `${queries.length} parallel`) +
-        theme.fg("dim", " — ") +
+        theme.fg("dim", " - ") +
         theme.fg("muted", names),
         0, 0,
       );
@@ -604,15 +604,15 @@ export default function (pi: ExtensionAPI) {
         );
       }
 
-      // Compact summary (always visible) — metadata only, no content
-      const lines = (details.results as any[]).map((r: any) => {
+      // Compact summary (always visible) - metadata only, no content
+      const lines = (details.results as any[]).map((r: any, i: number) => {
         const icon = r.status === "done" ? "✓" : "✗";
         const color = r.status === "done" ? "success" : "error";
         const elapsed = typeof r.elapsed === "number" ? Math.round(r.elapsed / 1000) : 0;
-        const brief = (r.output || "(empty)").split(/\n/).filter((l: string) => l.trim()).slice(0, 2).join(" | ");
-        return theme.fg(color, `${icon} [${r.agent}] ${displayName(r.agent)}`) +
-          theme.fg("dim", ` ${elapsed}s — `) +
-          theme.fg("muted", ` ${brief.slice(0, 60)}`);
+        const brief = (r.output || "(empty)").split(/\n/).filter((l: string) => l.trim()).slice(0, 2).join(" \n ");
+        return theme.fg(color, `${icon} [${i + 1}] ${displayName(r.agent)}`) +
+          theme.fg("dim", ` ${elapsed}s`) +
+          theme.fg("muted", `  ${brief.slice(0, 60)}`);
       });
 
       const header = lines.join("\n");
@@ -646,7 +646,7 @@ export default function (pi: ExtensionAPI) {
     for (const [key, s] of state.agents) {
       if (s.def.name.toLowerCase() === targetName) {
         totalCount++;
-        if (s.status !== "researching" && !stateKey) {
+        if (s.status === "idle" && !stateKey) {
           stateKey = key;
         }
       }
@@ -661,9 +661,8 @@ export default function (pi: ExtensionAPI) {
           elapsed: 0,
         });
       } else {
-        const statuses = Array.from(state.agents.entries()).map(([k, s]) => `${k}=${s.status}`).join(", ");
         return Promise.resolve({
-          output: `All ${totalCount} instances of "${displayName(expertName)}" are currently busy. Wait for them to finish. Current states: ${statuses}`,
+          output: `All ${totalCount} instances of "${displayName(expertName)}" are currently busy. Wait for them to finish.`,
           exitCode: 1,
           elapsed: 0,
         });
@@ -671,7 +670,7 @@ export default function (pi: ExtensionAPI) {
     }
 
     // Mark agent as researching so other concurrent queries see it as busy
-    const agent = state.agents.get(stateKey);
+    const agent = state.agents.get(stateKey!);
     if (agent) {
       agent.status = "researching";
       agent.activity.startTime = Date.now();
@@ -681,32 +680,32 @@ export default function (pi: ExtensionAPI) {
     }
 
     const startTime = Date.now();
-    let model = ctx.model
+    const model = ctx.model
       ? `${ctx.model.provider}/${ctx.model.id}`
       : "openrouter/google/gemini-3-flash-preview";
 
-    if (model && model.includes("gemini-3.5-flash")) {
-      model = "openrouter/google/gemini-2.5-flash";
+    const { spawn } = require("child_process") as any;
+
+    // Build extension args - detect if langfuse is loaded in parent process
+    const extArgs: string[] = [];
+    if (process.env.LANGFUSE_SECRET_KEY) {
+      const lfExt = join(ctx.cwd || process.cwd(), "extensions", "langfuse-trace.ts");
+      if (require("fs").existsSync(lfExt)) {
+        extArgs.push("-e", lfExt);
+      }
     }
 
-    const langfuseExt = join(ctx.cwd || process.cwd(), "extensions", "langfuse-trace.ts");
-    const args: string[] = [
+    const args = [
+      ...extArgs,
       "--mode", "json",
       "-p",
       "--no-session",
-      "--no-extensions"
-    ];
-
-    if (existsSync(langfuseExt)) {
-      args.push("-e", langfuseExt);
-    }
-
-    args.push(
       "--model", model,
       "--tools", state.agents.get(stateKey)!.def.tools.join(","),
-      "--system-prompt", state.agents.get(stateKey)!.def.systemPrompt,
-      question
-    );
+      "--thinking", "off",
+      "--append-system-prompt", state.agents.get(stateKey)!.def.systemPrompt,
+      question,
+    ];
 
     const textChunks: string[] = [];
     let buffer = "";
@@ -726,27 +725,27 @@ export default function (pi: ExtensionAPI) {
           if (!line.trim()) continue;
           try {
             const event = JSON.parse(line);
-            const delta = event.assistantMessageEvent;
-            if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
-              if (delta) {
+            if (event.type === "message_update") {
+              const delta = event.assistantMessageEvent;
+              if (delta?.type === "text_delta") {
                 textChunks.push(delta.delta || "");
                 const full = textChunks.join("");
                 const last = full.split("\n").filter((l: string) => l.trim()).pop() || "";
-                const a = state.agents.get(stateKey!);
-                if (a) {
-                  a.activity.lastOutputLine = last;
-                  a.activity.currentTask = last.slice(0, 60);
+                const agent = state.agents.get(stateKey!);
+                if (agent) {
+                  agent.activity.lastOutputLine = last;
+                  agent.activity.currentTask = last.slice(0, 60);
                   updateWidget();
                 }
               }
             } else if (event.type === "tool_execution_start") {
-              const a = state.agents.get(stateKey!);
-              if (a) {
-                a.activity.lastTool = event.toolName;
-                a.activity.lastToolIcon = toolToIcon(event.toolName);
-                a.activity.toolCount[event.toolName] = (a.activity.toolCount[event.toolName] || 0) + 1;
-                a.activity.contextLoaded = true;
-                a.activity.currentTask = `Running: ${event.toolName}`;
+              const agent = state.agents.get(stateKey!);
+              if (agent) {
+                agent.activity.lastTool = event.toolName;
+                agent.activity.lastToolIcon = toolToIcon(event.toolName);
+                agent.activity.toolCount[event.toolName] = (agent.activity.toolCount[event.toolName] || 0) + 1;
+                agent.activity.contextLoaded = true;
+                agent.activity.currentTask = `Running: ${event.toolName}`;
                 updateWidget();
               }
             }
@@ -761,22 +760,24 @@ export default function (pi: ExtensionAPI) {
         if (buffer.trim()) {
           try {
             const event = JSON.parse(buffer);
-            const delta = event.assistantMessageEvent;
-            if (event.type === "text_delta" || (event.type === "message_update" && delta?.type === "text_delta")) {
-              if (delta) textChunks.push(delta.delta || "");
+            if (event.type === "message_update") {
+              const delta = event.assistantMessageEvent;
+              if (delta?.type === "text_delta") textChunks.push(delta.delta || "");
             }
           } catch {}
         }
 
         const elapsed = Date.now() - startTime;
-        const a = state.agents.get(stateKey!);
-        if (a) {
-          a.status = code === 0 ? "done" : "error";
-          a.activity.elapsed = elapsed;
-          a.activity.currentTask = code === 0 ? "Complete" : `Error (exit ${code})`;
-          a.activity.contextLoaded = false;
+        const agent = state.agents.get(stateKey!);
+        if (agent) {
+          agent.status = code === 0 ? "done" : "error";
+          agent.activity.elapsed = elapsed;
+          agent.activity.currentTask = code === 0 ? "Complete" : `Error (exit ${code})`;
+          agent.activity.contextLoaded = false;
           updateWidget();
         }
+
+        process.stderr.write(`📊 Agent ${expertName} ${code === 0 ? "done" : "error"} in ${elapsed}ms\n`);
 
         ctx.ui.notify(
           `${displayName(expertName)} ${code === 0 ? "done" : "error"} in ${Math.round(elapsed / 1000)}s`,
@@ -792,10 +793,10 @@ export default function (pi: ExtensionAPI) {
 
       proc.on("error", (err: Error) => {
         const elapsed = Date.now() - startTime;
-        const a = state.agents.get(stateKey!);
-        if (a) {
-          a.status = "error";
-          a.activity.currentTask = `Error: ${err.message}`;
+        const agent = state.agents.get(stateKey!);
+        if (agent) {
+          agent.status = "error";
+          agent.activity.currentTask = `Error: ${err.message}`;
           updateWidget();
         }
 
@@ -842,7 +843,7 @@ export default function (pi: ExtensionAPI) {
     const expertNames = Array.from(state.agents.values()).map(s => displayName(s.def.name)).join(", ");
 
     const systemPrompt = `You are leading the ${state.currentTeam}. You have access to ${state.agents.size} team members.
-Use the \`query_tree_researchers\` tool to assign tasks to these members in parallel.
+Use the \`query_researchers\` tool to assign tasks to these members in parallel.
 Available members: ${expertNames}
 
 ${expertCatalog}`;
@@ -853,8 +854,6 @@ ${expertCatalog}`;
   // ── Session Start ────────────────────────────────────────────────────
 
   pi.on("session_start", async (_event, ctx) => {
-    applyExtensionDefaults(import.meta.url, ctx);
-
     state.widgetCtx = ctx;
     loadTeam(ctx.cwd, state.currentTeam);
     updateWidget();
@@ -862,15 +861,15 @@ ${expertCatalog}`;
     const expertNames = Array.from(state.agents.values()).map(s => displayName(s.def.name)).join(", ");
     ctx.ui.setStatus("research-tree", `Team: ${state.currentTeam}`);
     ctx.ui.notify(
-      `Research Tree loaded — ${state.agents.size} members in ${state.currentTeam}: ${expertNames}\n\n` +
+      `Research Tree loaded - ${state.agents.size} members in ${state.currentTeam}: ${expertNames}\n\n` +
       `/research-tree [name]  Switch teams (e.g. /research-tree literature-team)\n` +
       `/tree-status           Show current agent status\n\n` +
-      `Use the query_tree_researchers tool to use them!`,
+      `Use the query_researchers tool to use them!`,
       "info",
     );
 
     // Custom footer
-    ctx.ui.setFooter((_t: any, theme: any, _fd: any) => ({
+    ctx.ui.setFooter((_tui: any, theme: any, _footerData: any) => ({
       dispose: () => {},
       invalidate() {},
       render(width: number): string[] {
