@@ -280,7 +280,7 @@ export default function (pi: ExtensionAPI) {
         const header = theme.fg("accent", theme.bold("  Research Team"))
           + theme.fg("dim", `  │  ${state.currentTeam}`);
         lines.push(header);
-        lines.push(theme.fg("dim", "  ─".repeat(Math.min(60, Math.floor(width / 3)))));
+        lines.push(theme.fg("dim", "  " + "─".repeat(Math.max(10, width - 4))));
 
         // Agent lines
         for (const [key, agent] of state.agents) {
