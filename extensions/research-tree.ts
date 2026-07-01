@@ -17,7 +17,12 @@ import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 import { Container, Text, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import { Type } from "@sinclair/typebox";
 import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageRoot = join(__dirname, "..");
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -205,7 +210,10 @@ export default function (pi: ExtensionAPI) {
   let teamLoaded = false;
 
   function loadTeam(cwd: string, teamName: string) {
-    const agentsDir = join(cwd, ".pi", "agents");
+    let agentsDir = join(cwd, ".pi", "agents");
+    if (!existsSync(join(agentsDir, "teams.yaml"))) {
+      agentsDir = join(packageRoot, "agents");
+    }
     const teamsFile = join(agentsDir, "teams.yaml");
 
     state.agents.clear();
